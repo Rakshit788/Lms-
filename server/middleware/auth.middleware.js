@@ -9,12 +9,13 @@ import { User } from "../models/user.model.js";
 
 const authmiddleware =  asynchandler(async(req,resp, next) =>{
 try {
-        const acesstoken =  req?.cookies?.cookie
+        const acesstoken =  req?.cookies?.uid
+      
         if(!acesstoken){
             throw new ApiError(400 , "unable to find acess tokken")
         }
     
-       const decodedtoken =  jwt.verify(acesstoken , process.env.ACESS_SECRET) 
+       const decodedtoken =  jwt.verify(acesstoken , process.env.REFRESH_SECRET) 
     
        if(!decodedtoken){
      throw new  ApiError(400 , "unable to use acesstoken")
@@ -33,7 +34,7 @@ try {
 
 
 
-const currentroles =  () => async(req, resp ,next)=>{
+const currentroles =   async(req, resp ,next)=>{
   try {
     const currentrole =  req.user.role 
 
@@ -46,7 +47,7 @@ const currentroles =  () => async(req, resp ,next)=>{
     }
     next()
   } catch (error) {
-    throw error
+    throw new  ApiError("Authentication error " ,error)
   }
 }
 

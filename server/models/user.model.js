@@ -1,6 +1,6 @@
 import mongoose ,  { Schema}  from "mongoose";
 import   jwt   from 'jsonwebtoken'
-import bcrypt from  'bcrypt'
+import bcrypt from  'bcryptjs'
 import ApiError from "../utils/Api.error.js";
 import argon2 from "argon2";
 
@@ -60,37 +60,48 @@ role : {
 
 
 
-Userschema.pre("save" , async function (next){
+// Userschema.pre("save" , async function (next){
     
-  try {
-      if(this.isNew || this.isModified('password')){
-        const gensalt = await argon2.genSalt()
-       this.password = await argon2.hash(this.password, gensalt) ;
+//   try {
+//       if(this.isNew || this.isModified('password')){
+       
+      
+//        this.password = await bcrypt.hash(this.password , 10) ;
        
        
-       next()
-      }
-      else{
-       return next()
-      }
-  } catch (error) {
-    throw  error
-  }
- }) 
- Userschema.methods.isPasswordCorrect = async function (plainPassword) {
+//        next()
+//       }
+//       else{
+//        return next()
+//       }
+//   } catch (error) {
+//     throw  error
+//   }
+//  }) 
+//  Userschema.methods.isPasswordCorrect = async function (plainPassword) {
   
   
-    try {
-        console.log( plainPassword , this.password);
-        const result = await bcrypt.compare(plainPassword, this.password);
-        console.log(result);
-        return result;
-    } catch (error) {
-        // Handle any errors that may occur during password comparison
-        console.error("Error comparing passwords:", error);
-        throw error; // Rethrow the error to be handled elsewhere
-    }
-}
+//     try {
+    
+//         if(!plainPassword.startsWith('$')){
+//             plainPassword =  "$" +  plainPassword
+//             plainPassword =  plainPassword.toString()
+          
+//         }
+
+//         console.log( plainPassword , this.password);
+
+        
+
+//         const result = await argon2.verify(plainPassword, this.password);
+//         console.log(result);
+//         return result;
+//     } catch (error) {
+//         // Handle any errors that may occur during password comparison
+//         console.error("Error comparing passwords:", error);
+//         throw error; // Rethrow the error to be handled elsewhere
+//     }
+// }
 
 
 
@@ -104,7 +115,9 @@ Userschema.methods.generaterefreshtoken = function() {
     }
 
     return jwt.sign({
-        _id: this._id
+        _id: this._id , 
+        username : this.username , 
+        role  : this.role 
     }, secretKey, {
         expiresIn: expirationTime
     });

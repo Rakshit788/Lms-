@@ -3,7 +3,7 @@ import ApiError from "../utils/Api.error.js";
 import asynchandler from "../utils/asynchandler.js";
 import ApiResponse from "../utils/Api.response.js";
 import uploadOnLocalFilePath from "../utils/cloudinary.js";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import argon2 from "argon2";
 
 
@@ -30,7 +30,7 @@ const registeruser =  asynchandler(async(req, resp , next) =>{
         throw new ApiError(404, "All the fields are required");
     }
 
-    console.log(username , email);
+   
     const userExist = await User.findOne({
         $or: [
             { email: email },
@@ -84,7 +84,7 @@ const registeruser =  asynchandler(async(req, resp , next) =>{
 
 resp.status(200)
     .json(
-      new ApiResponse(200 ," user registered sucessfull" , createduser )
+      new ApiResponse(true ," user registered sucessfull" , createduser )
 )
 
 })
@@ -93,8 +93,8 @@ resp.status(200)
 
 const loginuser =  asynchandler(async (req,resp,next)=>{
 
-    const {username ,  password , email} =  req.body 
-    console.log(username ,  email , password);
+    let  {username ,  password , email} =  req.body 
+  
     
 
     if(!(username || email)) {
@@ -107,28 +107,33 @@ const loginuser =  asynchandler(async (req,resp,next)=>{
     }
 
  // Finding the user with the sent email
- const user = await User.findOne({ email })
+ const user = await User.findOne({
+    $and : [
+        {email} , 
+        {username}
+    ]
+ })
+
+
+ const respuser =  await User.findOne({
+    $or : [
+        {email} , 
+        {username} 
+    ]
+ }).select("-password")
 
 
 
  if(!user){
     throw new ApiError(400 , 'user is not found')
  }
- console.log( 'userpass' , user.password)
-
- // If no user or sent password do not match then send generic response
-//  const isPasswordVaild =  await   user.isPasswordCorrect(password) ; 
-const  passwordcheck = await argon2.verify(password, user.password)
-
-//  if(!isPasswordVaild){
-//     throw new ApiError(" password is incorrect ")
-//  }
+ 
 
 
-if(!passwordcheck){
-    throw new ApiError(" password is incorrect ")
-}
-   
+ if(password  != user.password){
+    throw new ApiError(400 , "password is not same" )
+ }
+ 
 
 
 //    const {acesstokrn , refreshtoken}  = await generateacesstokenAndRefreshtokens(user._id)  
@@ -144,10 +149,10 @@ if(!authtoken){
 }
 
    resp.status(200)
-      .cookie("cookie" , authtoken , options) 
+      .cookie("uid" , authtoken , { maxAge : 900000000, httpOnly: true }) 
     //   .cookie("refreshtoken" , refreshtoken , options) 
       .json(
-      new ApiResponse(200 , "user loggedin sucessfully" , )
+      new ApiResponse(200 ,respuser , "Logged in sucess fully" , true)
       )
 
 
@@ -179,7 +184,7 @@ const logoutuser = asynchandler(async(req,resp , next) =>{
 
    resp.status(200).send("Logged out successfully"); // Send a response indicating successful logout
    } catch (error) {
-    resp.status(400).send("something went wrong Logging out"); 
+    resp.status(400).send("something went wrong Logging out" , ); 
     throw(error)
    }
     
@@ -193,7 +198,7 @@ const changepassword =  asynchandler(async (req, resp ,next) =>{
 
     const {newpassword ,  password}  =  req.body
 
-    console.log(newpassword , password);
+    
 
     if (!(password && newpassword)) {
         throw new ApiError(400, "Both fields are required");
@@ -206,10 +211,10 @@ const changepassword =  asynchandler(async (req, resp ,next) =>{
 
  }
 
- console.log("HELLO HELLO");
+ 
 
  const validatepassword =  user.isPasswordCorrect(password) 
- console.log(validatepassword + "val oass");
+ 
 
  if(!validatepassword){
     throw new ApiError(400 ,  "Incorrect password")
@@ -225,7 +230,7 @@ user.refreshtoken = null;
 
 await user.save();
 
-console.log(user.refreshtoken);
+
 
 
 // Generate new tokens
@@ -250,7 +255,51 @@ resp.status(200)
     ))
  
 
-})
+}) 
+
+const changeprofile  =  asynchandler( async (req , resp, next) =>{
+const {updateuserame} =  req.body
+console.log(" updateusername " ,  updateuserame);
+const user  =  await  User.findById(req.user._id).select("-password") ;
+if(!user){
+    throw new ApiError(400 , "Unable to find  user to update the profile ")
+}
+if(updateuserame){
+    
+
+user.username =  updateuserame 
+
+
+}
+const   avatar1  =  req.file?.path
+
+
+if(avatar1){
+    
+const avatar  = await uploadOnLocalFilePath(avatar1) 
+
+
+ 
+
+if(!avatar ){
+    throw new ApiError(404, "Failed to update the Image")
+}
+user.avatar =   avatar
+await  user.save()
+resp.json(
+    new ApiResponse(200 , user  , "Both image and name changed sucessfully" )
+)
+}
+else{
+  await  user.save()
+  resp.json(
+    new ApiResponse(200 , user  , " name changed sucessfully" )
+)
+}
+
+
+
+ })
 
 
 
@@ -261,4 +310,4 @@ resp.status(200)
 
 
 
-export {loginuser , logoutuser , registeruser , changepassword}
+export {loginuser , logoutuser , registeruser , changepassword ,  changeprofile}

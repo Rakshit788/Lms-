@@ -1,8 +1,8 @@
 class ApiResponse {
-    constructor(statusCode, data, message = "success") {
+    constructor(statusCode, data, message = "success" , sucess) {
       this.statusCode = statusCode;
       this.data = data;
-      this.success = statusCode; // Corrected typo from `sucess` to `success`
+      this.success = sucess; // Corrected typo from `sucess` to `success`
     }
   }
 

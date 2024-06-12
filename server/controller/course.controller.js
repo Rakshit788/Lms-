@@ -14,6 +14,9 @@ const getallcourses =  asynchandler(async (req, resp ,next) =>{
 
     try {
         const course  = await Course.find({}).select("-lectures")
+        resp.status(200)
+        .json(new ApiResponse("true" ,  course))
+    
     } catch (error) {
         throw new ApiError("opps Something went wrong while fetching the courses")
     }
@@ -22,8 +25,6 @@ const getallcourses =  asynchandler(async (req, resp ,next) =>{
   
   
   
-    resp.status(200)
-    .json(new ApiResponse("true" ,  " All courses are being displayed"))
 
     
 } )
@@ -96,13 +97,16 @@ const createcourse =  asynchandler(async(req, resp,next)=>{
     if(!course){
         throw  new ApiError("unable to create a course")
     }
+    resp.status(200).json(
+        new ApiResponse(200 , course , "sucess creation" ,true)
+    )
+
+ 
   
     } catch (error) {
        throw error
     }
-  resp.status(200)
-     .json(new ApiResponse(true ,  "course created sucessfully "))
-  
+
   }) 
   
   

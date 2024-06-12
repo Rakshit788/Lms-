@@ -11,7 +11,13 @@ const courseschema = new Schema({
 
     thumbnail :  {
         type : String
+    } , 
+
+    price :{
+     type : Number 
     } ,
+
+    
     
     
     
@@ -29,12 +35,11 @@ const courseschema = new Schema({
         type : Number
     } , 
     createdperson : {
-        type : String
-    },
-
-    razor_plan_id  : {
-        type : String
+        type : String , 
+        
     }
+
+    
 
 }, {
     timestamps : true

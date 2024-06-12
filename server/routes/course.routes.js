@@ -9,8 +9,8 @@ const courserouter =  Router();
 
 
 courserouter.route('/')
-            .get(getallcourses)
-            .post(authmiddleware ,  upload.single('thumbnail')  , createcourse)
+            .get(authmiddleware , getallcourses)
+            .post(authmiddleware ,currentroles,  upload.single('thumbnail')  , createcourse)
             
                 
 courserouter.route('/:id')

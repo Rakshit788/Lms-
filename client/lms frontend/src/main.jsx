@@ -5,11 +5,14 @@ import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { Provider } from 'react-redux'
-import store from './assets/Redux/slice/store.js'
+import store from './Redux/store.js'
+
+
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 
-   <Provider store={ store}>
+   <Provider store={store }>
     <BrowserRouter>
     <App />
     <Toaster/>
