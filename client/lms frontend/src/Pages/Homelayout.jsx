@@ -80,6 +80,7 @@ const profile  =  (
     <Link className=" hover:text-purple-500 hover:underline px-5 text-[16px]">My cart </Link>
     <Link className=" hover:text-purple-500 hover:underline px-5 text-[16px]" to={'/updateprofile'}>Account  settings</Link>
     <Link className=" hover:text-purple-500 hover:underline px-5 text-[16px]">Purchase History</Link>
+    <Link className=' hover:text-purple-500 hover:underline px-5 text-[16px]' to={'/logout'}> Logut Account</Link>
   </div>
 
 ) ;
@@ -121,27 +122,34 @@ function Homelayout({ children }) {
           </div>
       <div className='mt-[20px] ml-[30px] '>
       <Popover content={content} >
- <Link className=' bg-transparent text-black hover:bg-transparet  text-[18px] '>Business</Link>
+ <Link className=' bg-transparent text-black hover:bg-transparet  hover:underline text-[18px] '>Business</Link>
   </Popover>
       </div>
       <div className='mt-[20px] ml-[30px] '>
       <Popover content={content1} >
- <Link className=' bg-transparent text-black hover:bg-transparet  text-[18px] '>My learning</Link>
+ <Link className=' bg-transparent text-black hover:bg-transparet  hover:underline text-[18px] '>My learning</Link>
   </Popover>
+      </div>
+      <div className='mt-[20px] ml-[30px] '>
+      <Link className=' bg-transparent text-black hover:bg-transparet  hover:underline text-[18px]  ml-[10px] mt-[10px]'>Plans and Pricing </Link>
       </div>
 
 
-          <div className=' ml-[200px] mt-[10px]   flex flex-row gap-3'>
+
+          <div className=' ml-[50px] mt-[10px]   flex flex-row gap-3'>
            
             {authbtn ? (
-        <Popover content = {profile} className=' ml-[7px] rounded-[1000%] bg-black text-white text-bold text-[20px] h-[53px] w-[53px] py-[9px] text-center'>
-          {dataUsername.charAt(0).toUpperCase()}
+        <Popover content = {profile} className=' ml-[7px] rounded-[1000%] hover:underline bg-black text-white text-bold text-[20px] h-[53px] w-[53px] py-[9px] text-center'>
+          {dataUsername.charAt(0).toUpperCase()} 
         </Popover>
       ) : (
         <button className="bg-black text-white font-bold border-transparent w-[100px] h-[43px] rounded-[20px]">
           <Link to="/login">Log In</Link>
         </button>
       )}
+          </div>
+          <div>
+            <button  className="bg-black text-white font-bold border-transparent w-[100px] ml-[9px] mt-[10px] h-[43px] rounded-[20px]"  ><Link to={'/signup'}>Signup</Link></button>
           </div>
            
         </div>

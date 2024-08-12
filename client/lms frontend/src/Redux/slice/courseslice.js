@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '../../helper/axiosinstance';
 import { toast } from 'react-hot-toast';
+import { updateUserCourse } from './authslice';
+import { useDispatch } from 'react-redux';
 
 const initialState = {
   courselist: [],
@@ -18,13 +20,30 @@ export const fetchcourses = createAsyncThunk('/courses', async () => {
 export const createCourse = createAsyncThunk('/checkauth/course/create', async (data) => {
   try {
     const resp = await axiosInstance.post('/course', data);
-    console.log(resp);
+    console.log( 'course data '  ,resp);
     return resp.data;
+   
+  
   } catch (error) {
     console.error('Error creating course:', error);
     // Handle error here
   }
 });
+
+export const fetchDashboardData = createAsyncThunk(
+  'dashboard/fetchData',
+  async (userIdarray) => {
+    try {
+      const response = await axiosInstance.post('/course', { ids: userIdarray });
+      return response.data;
+    } catch (error) {
+      console.error("Something went wrong while fetching courses", error);
+      throw error;
+    }
+  }
+);
+
+
 
 const courseSlice = createSlice({
   name: 'course',
@@ -43,6 +62,12 @@ const courseSlice = createSlice({
       state.error = true;
       console.error('Error fetching courses:', action.error.message);
     });
+    builder.addCase(createCourse.rejected ,  (state , action)=>{
+      toast.error('something went wrong while ctreating course') 
+      state.iscreated =  false ,
+      state.error =  true 
+
+    })
     builder.addCase(createCourse.fulfilled, (state, action) => {
       toast.success('Course created successfully');
       state.courselist.push(action.payload);

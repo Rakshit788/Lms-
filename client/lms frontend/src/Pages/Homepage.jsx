@@ -70,6 +70,7 @@ function Homepage() {
         <div className='flex flex-col bg-white'>
           <h1 className='text-black text-[20px] font-bold mt-[12px]'>What to Learn Next</h1>
           <div className='flex gap-3 flex-wrap w-[100%] mt-[10px]'>
+            {console.log( "fetched data", courselist)}
             {currentCourses.map((element) => (
               <CourseCard key={element._id} data={element} />
             ))}
@@ -94,7 +95,7 @@ function Homepage() {
       </div>
 
       
-      <div className=' w-full h-[350px]  bg-slate-900 flex flex-col  '> 
+      <div className=' w-full h-[350px]  bg-slate-900 flex flex-col  mt-[40px] '> 
 
       <div className='flex flex-row w-[100%] h-[80px] justify-between border-[1px] border-b-gray-600'>
        <div className=' text-white flex flex-col'>

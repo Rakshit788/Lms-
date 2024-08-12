@@ -13,9 +13,10 @@ const courseschema = new Schema({
         type : String
     } , 
 
-    price :{
-     type : Number 
-    } ,
+    price : {
+     type : Number , 
+     min :  0 
+    }  ,
 
     
     

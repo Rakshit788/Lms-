@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 // Import your components and pages
 import Homelayout from './Pages/Homelayout';
+import Dasboard from './Pages/Admin/AdDashboard';
 import Homepage from './Pages/Homepage';
 import Aboutus from './Pages/Aboutus';
 import Signup from './Pages/Signup';
@@ -17,6 +18,7 @@ import Updateprofile from './Pages/UpdateuserProfile';
 import ChangePassword from './Pages/Changepassword';
 import { createTheme  ,  ThemeProvider} from '@mui/material/styles';
 import { withTheme } from '@emotion/react';
+import { useSelector } from 'react-redux';
 
 
 
@@ -24,6 +26,15 @@ import { withTheme } from '@emotion/react';
 
 
 function App() {
+
+  const data  =  useSelector((state) => state.auth.data)
+  console.log(data, data._id);
+  const id  =  data?._id
+
+   
+  const role  =  data?.role 
+
+
   return (
     <>
     
@@ -37,12 +48,18 @@ function App() {
           <Route path='/courses' element={<CoursePage />} />
           <Route path='/logout' element={<Logout />} />
           <Route path='/description' element={<CourseDetails />} />
-          <Route path='/checkauth' element={<Authcheck />}>
-            <Route path='course/create' element={<CourseCreate />} />
-          </Route>
-          <Route path='/notfound' element={<Err />} />
+          <Route element={<Authcheck />}>
+          <Route path='/course/create' element={<CourseCreate />} />
+          {role === 'Admin' ? (
+            <Route path={`/admin-${id}/dashboard`} element={<Dasboard />} />
+          ) : (
+            <Route path='/notfound' element={<Err />} />
+          )}
+        </Route>
+        <Route path='/notfound' element={<Err />} />
           <Route path='/updateProfile' element={<Updateprofile/>}></Route>
           <Route path='/changepassword' element = {<ChangePassword/>}></Route>
+
         
       </Routes>
     </>

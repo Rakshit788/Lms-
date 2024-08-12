@@ -85,11 +85,19 @@ try {
 
 
 
+
+
 // Slice
 export const authslice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    updateUserCourse(state, action) {
+      const newCourse = action.payload;
+      state.data.courses.push(newCourse);
+      localStorage.setItem('data', JSON.stringify(state.data)); // Update local storage
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginaccount.fulfilled, (state, action) => {
@@ -137,5 +145,7 @@ export const authslice = createSlice({
       });
   }
 });
+
+export const { updateUserCourse } = authslice.actions;
 
 export default authslice.reducer;

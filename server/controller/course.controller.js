@@ -4,30 +4,46 @@ import asynchandler from "../utils/asynchandler.js";
 import { Course } from "../models/course.model.js";
 import e from "express";
 import upload from "../middleware/multer.middleware.js";
-import uploadOnLocalFilePath from "../utils/cloudinary.js";
+import uploadOnLocalFilePath from "../utils/cloudinary.js"; 
+import { User } from "../models/user.model.js";
 
 
 
 
 
-const getallcourses =  asynchandler(async (req, resp ,next) =>{
+const getallcourses = asynchandler(async (req, res, next) => {
+    const ids = req.body.ids;
+    const coursesOfperson = [];
 
-    try {
-        const course  = await Course.find({}).select("-lectures")
-        resp.status(200)
-        .json(new ApiResponse("true" ,  course))
-    
-    } catch (error) {
-        throw new ApiError("opps Something went wrong while fetching the courses")
+    // Check if ids is an array
+    if (Array.isArray(ids)) {
+        try {
+            // Fetch courses by ID
+            for (const id of ids) {
+                const course = await Course.findById(id);
+                if (course) {
+                    coursesOfperson.push(course);
+                } else {
+                    // Optionally, handle cases where the course is not found
+                    console.warn(`Course with ID ${id} not found.`);
+                }
+            }
+
+            // Send response with fetched courses
+            res.status(200).json(coursesOfperson);
+
+        } catch (error) {
+            // Handle errors during fetching
+            console.error('Error fetching courses:', error);
+            next(error); // Pass error to error-handling middleware
+        }
+    } else {
+        // Handle case where ids is not an array
+        const error = new ApiError(400, "Invalid input: 'ids' should be an array");
+        next(error); // Pass error to error-handling middleware
     }
+});
 
-  
-  
-  
-  
-
-    
-} )
 
 
 
@@ -56,23 +72,40 @@ const getlecturesThroughId =  asynchandler(async(req, resp , next) =>{
 
 const createcourse =  asynchandler(async(req, resp,next)=>{
     try {
-              const {Instructorname , category , description , title }  = req.body
-              console.log(Instructorname,category , description ,title);
+              const {title,person,category,des,price }  = req.body
+              console.log( price);
     
-    if(!Instructorname )  {
+    if(!person )  {
         throw new ApiError(400 , "Instructor name is required")
     }        
     
-    if(!( category || description || title)){
-    throw  new ApiError(400, 'Something went wrong with details of course ')
-    
-   
-    
+      // Check if Instructorname is provided
+      if (!person) {
+        throw new ApiError(400, "Instructor name is required");
+    }
+
+    // Check if category is provided
+    if (!category) {
+        throw new ApiError(400, "Category is required");
+    }
+
+    // Check if description is provided
+    if (!des) {
+        throw new ApiError(400, "Description is required");
+    }
+
+    // Check if title is provided
+    // if (!title) {
+    //     throw new ApiError(400, "Title is required");
+    // }
+
+    // Check if price is provided and is not an empty string
+    if (price === "" || isNaN(price)) {
+        throw new ApiError(400, "Valid price is required");
     }
     
-    
     const thumbnail   =   req.file.path 
-    console.log(thumbnail);
+   
     
     if(!thumbnail){
         throw new ApiError(400 ,  "unable the find the thumnail")
@@ -87,22 +120,42 @@ const createcourse =  asynchandler(async(req, resp,next)=>{
     
     const course = await Course.create({
         title : title , 
-        description: description , 
-        createdperson: Instructorname , 
+        description: des , 
+        createdperson: person , 
         category : category , 
-        thumbnail : thumbnailurl
+        thumbnail : thumbnailurl,
+        price : Number(price) , 
     
     })
     
     if(!course){
         throw  new ApiError("unable to create a course")
-    }
+    }  
+     const id  = req.user._id ; 
+       
+     const user  =  await  User.findById(id) 
+     console.log(user.username);  
+
+     if(!user){
+        throw  new ApiError('unable to find user to add course')
+     }
+
+ await user.courses.push(course.id) ; 
+
+  console.log('user courses ' ,user.courses);
+
+  await user.save() ;
+
+
+
+
+     
+    
     resp.status(200).json(
-        new ApiResponse(200 , course , "sucess creation" ,true)
+        new ApiResponse(200 , course , "sucess creation and addition" ,true)
     )
 
  
-  
     } catch (error) {
        throw error
     }
@@ -155,7 +208,7 @@ const deletecourse = asynchandler(async(req, resp , next)=>{
 
 const createLecturesThroughId =  asynchandler(async(req,resp ,next) =>{
  const {id} =  req.params
- const {title ,  description} =  req.body
+ const {title ,  description  } =  req.body
 
 
  if(!(title && description)){
@@ -182,7 +235,8 @@ const createLecturesThroughId =  asynchandler(async(req,resp ,next) =>{
  course.lectures.push({
     title :  title,
     description: description ,
-    url : viedolectureUrl
+    url : viedolectureUrl 
+
  }) 
  
 

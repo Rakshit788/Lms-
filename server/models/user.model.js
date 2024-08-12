@@ -48,7 +48,14 @@ role : {
     type : String , 
     enum : ['User' , 'Admin' ] , 
     default : "User"
-}
+} ,
+
+courses : [
+    {
+    type  : Schema.Types.ObjectId ,
+    ref :  "Course"
+    }
+]
 
 
 

@@ -61,17 +61,18 @@ function LoginPage(){
   console.log(jsondata);
 
 const response = await dispatch(loginaccount(jsondata)) 
+const payloadData = response?.payload?.data;
 
-console.log(response?.payload.success);
- 
+if (response?.payload?.success) {
+    console.log(payloadData?.role);
+  if (payloadData?.role === 'Admin') {
+    navigate(`/admin-${payloadData._id}/dashboard`);
+  } else if (payloadData?.user === 'User') {
+    navigate('/');
+  }
+}
 
- if(response?.payload.success == true){
  
-    
-navigate('/')
-   
-    
- }
    
 
 
